@@ -1,0 +1,17 @@
+# secrets and local config
+.env
+*.key
+
+# fetched third-party source cache
+.cache/
+/tmp/lab_cache/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# never commit the private sibling, even if nested by mistake
+agent-security-lab-private/
+private/
