@@ -28,10 +28,11 @@ docs/INDEX.md   one line per investigation with its headline result
 ## What is here vs. what is kept private
 
 Some investigations measure the author's *own* agents, logs, and repos.
-Publishing those results would be a map of a real attack surface, so they are
-not here. The method is described; the results live in a separate, un-pushed
-private repo that imports this harness. The split is enforced by a local
-pre-commit hook; see `docs/INDEX.md`.
+Publishing those results would map a real attack surface, so they are not here:
+only the method is. This repo is published from a private working repo, and
+investigations that touch the author's own systems keep their results there. A
+local pre-commit leak guard blocks internal names and secret-shaped strings from
+entering this repo; see `docs/INDEX.md` for which investigations are public.
 
 This mirrors how security researchers publish: the technique and the benchmark
 are public, a specific system's live findings are not.
