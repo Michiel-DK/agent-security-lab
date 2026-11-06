@@ -6,7 +6,7 @@ Defaults match a local Ollama install; set MODEL_BACKEND=claude to use the API.
     MODEL_BACKEND   ollama (default) | claude
     OLLAMA_MODEL    default: gemma4:e4b
     OLLAMA_HOST     default: http://localhost:11434
-    ANTHROPIC_MODEL default: claude-opus-4-8   (only used when backend=claude)
+    ANTHROPIC_MODEL default: claude-opus-5-5   (only used when backend=claude)
 
 The client exposes one method, complete(system, user) -> str, so an
 investigation can swap backends without changing its own code.
@@ -65,7 +65,7 @@ class ClaudeClient:
     with no SDK installed as long as the Ollama backend is used."""
 
     def __init__(self, model: str | None = None):
-        self.model = model or os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-8")
+        self.model = model or os.environ.get("ANTHROPIC_MODEL", "claude-opus-5-5")
         try:
             import anthropic  # noqa: F401
         except ImportError as exc:
@@ -77,13 +77,23 @@ class ClaudeClient:
         self._client = anthropic.Anthropic()
 
     def complete(self, system: str, user: str) -> str:
+        # No sampling params: the API rejects temperature/top_p/top_k on
+        # current models. Effort is the only depth control; "low" keeps a
+        # short JSON answer cheap and deterministic enough for scoring.
+        # Top-level cache_control: repeated passes over the same file re-read
+        # the cached prefix instead of paying for it again.
         msg = self._client.messages.create(
             model=self.model,
-            max_tokens=1024,
-            temperature=0,
+            max_tokens=2048,
             system=system,
             messages=[{"role": "user", "content": user}],
+            output_config={"effort": os.environ.get("ANTHROPIC_EFFORT", "low")},
+            cache_control={"type": "ephemeral"},
         )
+        self.last_usage = getattr(msg, "usage", None)
+        if msg.stop_reason == "refusal":
+            cat = getattr(getattr(msg, "stop_details", None), "category", None)
+            raise ModelError(f"model refused (category={cat})")
         return "".join(block.text for block in msg.content if getattr(block, "type", None) == "text")
 
     def label(self) -> str:

@@ -14,11 +14,21 @@ Per case we report precision and recall. We aggregate two ways:
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+
+# C code in php-src defines many functions through macros such as
+# PHP_FUNCTION(session_start). A model may answer either "session_start" or
+# "PHP_FUNCTION(session_start)"; both must normalise to the same key.
+_MACRO = re.compile(r"^(?:php|zend)_(?:function|method|named_function)\s*\(\s*([^)]+)\)$", re.I)
 
 
 def _norm(name: str) -> str:
-    return name.strip().strip("()").split("(")[0].strip().lower()
+    n = name.strip()
+    m = _MACRO.match(n)
+    if m:
+        return "::".join(a.strip().lower() for a in m.group(1).split(",") if a.strip())
+    return n.strip("()").split("(")[0].strip().lower()
 
 
 def normalize_set(names) -> set[str]:
