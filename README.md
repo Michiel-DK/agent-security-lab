@@ -51,8 +51,10 @@ Set `MODEL_BACKEND=claude` with `ANTHROPIC_API_KEY` to compare against the API.
 
 ## Status
 
-See `docs/INDEX.md`. Investigation 01 is run with real numbers in its
-`findings.md`; the rest are planned and intentionally have no directory yet.
+See `docs/INDEX.md`. Investigations 01 and 05 are run and posted, with real
+numbers in their `findings.md` (05 re-derives its table with `check.py`).
+Investigations 03 and 04 are run; their results are private and only their
+method (`question.md`) is public. 02 is being redesigned. 06 is planned.
 
 ## License
 
