@@ -1,3 +1,5 @@
+> STATUS: superseded-by docs/notes/php-ai-auditor.md
+
 # PHP2Shell, 21 to 23 October 2026: claims versus evidence
 
 A dated record of what was said about CVE-2026-109618 and CVE-2026-109619 in

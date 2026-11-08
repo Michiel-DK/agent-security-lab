@@ -1,12 +1,29 @@
 # agent-security-lab
 
-A lab notebook for AI-agent security. Each investigation asks one question,
-runs a reproducible experiment, and records a measured result. The method and
-the harness are the point, not any single number.
+## Lab
 
-Built because the October 2026 PHP disclosures were found with AI and the public
-reaction assumed models can reliably find vulnerabilities. Whether they can, and
-how often they are wrong, is a measurable question. This repo measures it.
+A scripts-only lab that measures security techniques for agentic flows on the author's own sandbox exams. The exams
+use fictional companies and contacts. Each investigation asks one question, with a small n. Its prediction is
+committed before it runs, its case set and kill clause are written down first, and its grading is deterministic: no
+model judge scores a number. Every posted number has a script that re-derives it from committed results, with no API
+key, no model call and no GPU. The lab is scripts and results files only, with no notebook.
+
+```sh
+python3 -m lab check        # re-derives every posted number; exit 1 on drift
+python3 -m lab check 01     # one investigation
+```
+
+In this public repo `lab check` re-derives 01 and 05. For 07, 08 and 09, whose results are private, it only asserts
+that the INDEX rows carry no number. In the private source repo it re-derives all five.
+
+**Chapter 0, AI as auditor (closed).** The lab started from the October 2026 PHP disclosures, which were reported as
+"found with AI". Investigations 01 and 05 measured whether a model can name the vulnerable function in a known-vulnerable
+file. They tested Opus 5.5 and then three model tiers on 20 post-cutoff CVEs. Recall was low and flat across tiers, and
+models flagged already-fixed functions. The chapter is closed and has one canonical note,
+`docs/notes/php-ai-auditor.md`, which carries the headline cells, the claims-vs-evidence record and the reopen
+threshold.
+
+A lab is read, not installed. The `lab` package exists to reproduce numbers, not to be a tool.
 
 ## Scope and ethics
 
@@ -20,9 +37,12 @@ how often they are wrong, is a measurable question. This repo measures it.
 ## Layout
 
 ```
-lab/            shared harness: model clients, source fetcher, scoring
-investigations/ one directory per run: question.md, run.py, dataset/, findings.md
+lab/            shared harness: model clients, source fetcher, scoring; `python3 -m lab check|diff|run`
+investigations/ one directory per run: question.md, run.py, dataset/, results/, findings.md
 docs/INDEX.md   one line per investigation with its headline result
+docs/QUESTIONS.md  the planned questions: case set, grader, kill clause
+docs/CASES.md   which case set each investigation grades on
+docs/notes/     dated notes; php-ai-auditor.md is canonical for chapter 0
 ```
 
 ## What is here vs. what is kept private
@@ -51,10 +71,15 @@ Set `MODEL_BACKEND=claude` with `ANTHROPIC_API_KEY` to compare against the API.
 
 ## Status
 
-See `docs/INDEX.md`. Investigations 01 and 05 are run and posted, with real
-numbers in their `findings.md` (05 re-derives its table with `check.py`).
-Investigations 03 and 04 are run; their results are private and only their
-method (`question.md`) is public. 02 is being redesigned. 06 is planned.
+One line per investigation in `docs/INDEX.md`; planned questions in `docs/QUESTIONS.md`.
+
+| | |
+|---|---|
+| closed (chapter 0) | 01 CVE localization · 05 model comparison. Both posted and re-derived by `lab check`; see `docs/notes/php-ai-auditor.md` |
+| run, private results | 03 secret hygiene · 04 dependency exposure (they measure the author's own machine; only `question.md` is public) |
+| run, private results | 07 indirect injection, hosted vs local · 08 confirm-on-mutate · 09 PII redaction (sandbox exams; cases carry plant text) |
+| planned | 02 memory poisoning (lanes lab-asl-07 case set, lab-asl-09 run) · 06 defenses and their cost (lane lab-asl-11) |
+| later | 10 tool-description poisoning |
 
 ## License
 
