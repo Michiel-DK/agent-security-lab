@@ -2,10 +2,11 @@
 
 > STATUS: canonical for chapter 0 (investigations 01 and 05). Closed 2026-11-08. Supersedes
 > `notes/2026-10-23-php2shell-claims-vs-evidence.md`, whose content is folded in below.
-> Every number on this page is copied from `investigations/01-cve-localization/findings.md`,
-> `investigations/05-model-comparison/findings.md` or the 01 row of `docs/INDEX.md`. `python3 -m lab check 01` and
-> `python3 -m lab check 05` re-derive those files from the committed results. For any figure not shown here, see the
-> findings files.
+> Every lab number on this page ("Headline cells", "What it says") is copied from
+> `investigations/01-cve-localization/findings.md`, `investigations/05-model-comparison/findings.md` or the 01 row of
+> `docs/INDEX.md`. `python3 -m lab check 01` and `python3 -m lab check 05` re-derive those files from the committed
+> results. For any figure not shown here, see the findings files. The PHP2Shell section at the end is a dated record of
+> outward claims as of 23 October 2026, with its sources listed. Its figures are not lab results, and no check covers them.
 
 ## Why this chapter existed
 
