@@ -13,8 +13,11 @@ python3 -m lab check        # re-derives every posted number; exit 1 on drift
 python3 -m lab check 01     # one investigation
 ```
 
-In this public repo `lab check` re-derives 01 and 05. For 07, 08 and 09, whose results are private, it only asserts
-that the INDEX rows carry no number. In the private source repo it re-derives all five.
+In this public repo `lab check` re-derives 01 and 05 from their results files, and 07, 08 and 09 from their counts-only
+`receipt.json`: every number in their INDEX and LESSONS rows must be one the receipt carries. The results, cases and
+findings behind those receipts stay private. In the private source repo it re-derives all five from the results and
+asserts each receipt equals a fresh derivation. The 07–09 prediction files quote planted text and stay private; `LESSONS.md`
+carries their predicted numbers beside the results, and each receipt names the commit the prediction was committed in.
 
 **Chapter 0, AI as auditor (closed).** The lab started from the October 2026 PHP disclosures, which were reported as
 "found with AI". Investigations 01 and 05 measured whether a model can name the vulnerable function in a known-vulnerable
@@ -77,7 +80,7 @@ One line per investigation in `docs/INDEX.md`; planned questions in `docs/QUESTI
 |---|---|
 | closed (chapter 0) | 01 CVE localization · 05 model comparison. Both posted and re-derived by `lab check`; see `docs/notes/php-ai-auditor.md` |
 | run, private results | 03 secret hygiene · 04 dependency exposure (they measure the author's own machine; 04 publishes only its `question.md`, 03 stays private in full because its question names local paths) |
-| run, private results | 07 indirect injection, hosted vs local · 08 confirm-on-mutate · 09 PII redaction (sandbox exams; cases carry plant text) |
+| run, counts public | 07 indirect injection, hosted vs local · 08 confirm-on-mutate · 09 PII redaction (sandbox exams; counts in each `receipt.json` and in `LESSONS.md`, cases carry plant text and stay private) |
 | planned | 02 memory poisoning (lanes lab-asl-07 case set, lab-asl-09 run) · 06 defenses and their cost (lane lab-asl-11) |
 | later | 10 tool-description poisoning |
 

@@ -11,11 +11,14 @@ Investigation 01 is checked three ways:
   3. the 01 row of `docs/INDEX.md` must quote the same numbers.
 Not checked: numbers in findings.md's prose ("Reading"), README's Lab section and SHOWCASE.md; they copy table cells.
 Investigation 05 has its own `check.py`; it is run as a subprocess and its exit code is the verdict.
-Investigation 07 has its own `check.py` (derive + compare); it is imported and given the repo root, so tests can point it
-at a tampered copy.
-Investigation 08 has its own `check.py` (re-replays the case set through the rule, then compares the counts); it is
-imported and given the repo root the same way. Investigation 09's `check.py` (re-runs the redactor against the key,
-ties each sit to its inputs, re-derives the pass counts) is wired the same way.
+Investigations 07, 08 and 09 keep their results, cases and findings private (they carry plant text) and publish a
+counts-only `receipt.json`, derived by code (`python3 -I check.py --receipt` in the investigation). They are checked in two
+modes. Private checkout (results present): the receipt must equal a fresh derivation, then the investigation's own
+`check.py` re-derives findings.md (07: derive + compare; 08: re-replays the case set through the rule; 09: re-runs the
+redactor against the key and ties each sit to its inputs). Public checkout (results absent): only the receipt is there.
+In both modes every k/n or two-decimal number in the docs/INDEX.md row and in the result cell of the LESSONS.md row must
+be one the receipt carries, and the INDEX row must carry at least one (operator decision 2026-11-09: counts public,
+cases private).
 """
 from __future__ import annotations
 
@@ -199,56 +202,93 @@ def check_05(verbose: bool = True) -> list[str]:
     return []
 
 
+_RATIO = re.compile(r"(\d+)\s*(?:/|of)\s*(\d+)")
+_DECIMAL = re.compile(r"(?<![\d.])0\.\d{2}(?!\d)")
+
+
+def _receipt_tokens(obj, out: set) -> set:
+    """Every [k, n] pair in the receipt as 'k/n', 'k of n' and its two-decimal fraction; every bare int as itself."""
+    if isinstance(obj, list) and len(obj) == 2 and all(isinstance(x, int) and not isinstance(x, bool) for x in obj):
+        k, n = obj
+        out.update({f"{k}/{n}", f"{k} of {n}"})
+        if n:
+            out.add(f"{k / n:.2f}")
+    elif isinstance(obj, dict):
+        for v in obj.values():
+            _receipt_tokens(v, out)
+    elif isinstance(obj, list):
+        for v in obj:
+            _receipt_tokens(v, out)
+    elif isinstance(obj, int) and not isinstance(obj, bool):
+        out.add(str(obj))
+    return out
+
+
+def _row_numbers(cell: str) -> list[str]:
+    nums = [f"{m.group(1)}/{m.group(2)}" for m in _RATIO.finditer(cell)]
+    return nums + _DECIMAL.findall(cell)
+
+
+def _public_rows_drift(num: str, rec: dict, root: Path) -> list[str]:
+    """The INDEX row and the LESSONS result cell may only carry numbers the receipt carries."""
+    allowed = _receipt_tokens(rec, set())
+    drift = []
+    index = (root / "docs" / "INDEX.md").read_text()
+    m = re.search(rf"^\| {num} \|.*$", index, re.M)
+    if not m:
+        return [f"INDEX: no {num} row"]
+    nums = _row_numbers(m.group(0))
+    if not nums:
+        drift.append(f"INDEX {num} row carries no count; receipt.json has them")
+    for x in nums:
+        if x not in allowed and x.replace("/", " of ") not in allowed:
+            drift.append(f"INDEX {num} row carries {x}, which receipt.json does not re-derive")
+    lessons = (root / "LESSONS.md").read_text() if (root / "LESSONS.md").exists() else ""
+    m = re.search(rf"^\| {num} .*$", lessons, re.M)
+    if m:
+        cells = [c.strip() for c in m.group(0).strip().strip("|").split("|")]
+        if len(cells) >= 3:
+            for x in _row_numbers(cells[2]):
+                if x not in allowed and x.replace("/", " of ") not in allowed:
+                    drift.append(f"LESSONS {num} result cell carries {x}, which receipt.json does not re-derive")
+    return drift
+
+
+def _check_receipted(num: str, inv_dir: str, verbose: bool, root: Path) -> list[str]:
+    inv = root / "investigations" / inv_dir
+    rec_path = inv / "receipt.json"
+    if not rec_path.exists():
+        return [f"{num}: no receipt.json at {rec_path.relative_to(root)}"]
+    rec = json.loads(rec_path.read_text())
+    drift = []
+    private = (inv / "results").exists() and (inv / "check.py").exists()
+    if private:
+        spec = importlib.util.spec_from_file_location(f"inv{num}_check", inv / "check.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        fresh = json.loads(json.dumps(mod.receipt(root), ensure_ascii=False))
+        if fresh != rec:
+            diff = sorted(k for k in set(fresh) | set(rec) if fresh.get(k) != rec.get(k))
+            drift.append(f"{num} receipt.json differs from a fresh derivation in {diff}")
+        drift += mod.check(root, verbose=verbose)
+    elif verbose:
+        print(f"  {num} results private, absent here: checked the INDEX and LESSONS rows against receipt.json")
+    drift += _public_rows_drift(num, rec, root)
+    if verbose and not any(d.startswith(("INDEX", "LESSONS")) for d in drift):
+        print(f"  {num} INDEX row and LESSONS result cell: every count re-derives from receipt.json")
+    return drift
+
+
 def check_07(verbose: bool = True, root: Path = ROOT) -> list[str]:
-    """07's results and findings are private (they hold planted text), so no published file may carry a 07 number.
-    Both modes assert that the INDEX 07 row has none; the private checkout also re-derives findings.md."""
-    inv = root / "investigations" / "07-injection-hosted"
-    if not inv.exists():
-        index = (root / "docs" / "INDEX.md").read_text()
-        m = re.search(r"^\| 07 \|.*$", index, re.M)
-        hits = re.findall(r"\d+/\d+", m.group(0)) if m else []
-        if verbose:
-            print("  07 results private, absent here: only checked that the INDEX 07 row carries no number")
-        return ([] if m else ["INDEX: no 07 row"]) + ([f"INDEX 07 row carries {hits} with no results to re-derive them"] if hits else [])
-    spec = importlib.util.spec_from_file_location("inv07_check", inv / "check.py")
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod.check(root, verbose=verbose)
+    return _check_receipted("07", "07-injection-hosted", verbose, root)
 
 
 def check_08(verbose: bool = True, root: Path = ROOT) -> list[str]:
-    """08's case set holds planted text, so it stays private; no published file may carry an 08 number.
-    Both modes assert that the INDEX 08 row has none; the private checkout also re-replays and re-derives findings.md."""
-    inv = root / "investigations" / "08-confirm-on-mutate"
-    if not inv.exists():
-        index = (root / "docs" / "INDEX.md").read_text()
-        m = re.search(r"^\| 08 \|.*$", index, re.M)
-        hits = re.findall(r"\d+\s*(?:/|of)\s*\d+", m.group(0)) if m else []
-        if verbose:
-            print("  08 results private, absent here: only checked that the INDEX 08 row carries no number")
-        return ([] if m else ["INDEX: no 08 row"]) + ([f"INDEX 08 row carries {hits} with no results to re-derive them"] if hits else [])
-    spec = importlib.util.spec_from_file_location("inv08_check", inv / "check.py")
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod.check(root, verbose=verbose)
+    return _check_receipted("08", "08-confirm-on-mutate", verbose, root)
 
 
 def check_09(verbose: bool = True, root: Path = ROOT) -> list[str]:
-    """09's corpus holds the exam's inputs (including their planted-instruction text), so it stays private; no published
-    file may carry a 09 number. Both modes assert that the INDEX 09 row has none; the private checkout also re-runs the
-    redactor against the key, ties every sit to its inputs, and re-derives findings.md."""
-    inv = root / "investigations" / "09-pii-redaction"
-    spec = importlib.util.spec_from_file_location("inv09_check", inv / "check.py") if (inv / "check.py").exists() else None
-    if spec is None:
-        index = (root / "docs" / "INDEX.md").read_text()
-        m = re.search(r"^\| 09 \|.*$", index, re.M)
-        hits = re.findall(r"\d+\s*(?:/|of)\s*\d+", m.group(0)) if m else []
-        if verbose:
-            print("  09 results private, absent here: only checked that the INDEX 09 row carries no number")
-        return ([] if m else ["INDEX: no 09 row"]) + ([f"INDEX 09 row carries {hits} with no results to re-derive them"] if hits else [])
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod.check(root, verbose=verbose)
+    return _check_receipted("09", "09-pii-redaction", verbose, root)
 
 
 CHECKS = {"01": check_01, "05": check_05, "07": check_07, "08": check_08, "09": check_09}
