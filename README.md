@@ -3,9 +3,9 @@
 ## Lab
 
 A scripts-only lab that measures security techniques for agentic flows on the author's own sandbox exams. The exams
-use fictional companies and contacts. Each investigation asks one question, with a small n. Its prediction is
-committed before it runs, its case set and kill clause are written down first, and its grading is deterministic: no
-model judge scores a number. Every posted number has a script that re-derives it from committed results, with no API
+use fictional companies and contacts. Each investigation asks one question, with a small n. From 07 on, its prediction is
+committed before it runs and its case set and kill clause are written down first (01 and 05 predate that protocol and
+say so in `LESSONS.md`); its grading is deterministic: no model judge scores a number. Every posted number has a script that re-derives it from committed results, with no API
 key, no model call and no GPU. The lab is scripts and results files only, with no notebook.
 
 ```sh
