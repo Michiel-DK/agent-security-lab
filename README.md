@@ -76,7 +76,7 @@ One line per investigation in `docs/INDEX.md`; planned questions in `docs/QUESTI
 | | |
 |---|---|
 | closed (chapter 0) | 01 CVE localization · 05 model comparison. Both posted and re-derived by `lab check`; see `docs/notes/php-ai-auditor.md` |
-| run, private results | 03 secret hygiene · 04 dependency exposure (they measure the author's own machine; only `question.md` is public) |
+| run, private results | 03 secret hygiene · 04 dependency exposure (they measure the author's own machine; 04 publishes only its `question.md`, 03 stays private in full because its question names local paths) |
 | run, private results | 07 indirect injection, hosted vs local · 08 confirm-on-mutate · 09 PII redaction (sandbox exams; cases carry plant text) |
 | planned | 02 memory poisoning (lanes lab-asl-07 case set, lab-asl-09 run) · 06 defenses and their cost (lane lab-asl-11) |
 | later | 10 tool-description poisoning |

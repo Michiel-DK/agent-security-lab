@@ -29,11 +29,11 @@ Case-set pins below are agent-sandbox commits. Its `master` was at `2806cbd` on 
 
 ## 07: Does a hosted model resist instructions planted in tool results and inbound mail?
 
-The local 2B champion resists 4 of 7 planted-instruction cases. Two cheap hosted models resisted 6 of 7 in one pass
-(probe N-A5, 22 Oct, $0.0051 metered; run head agent-sandbox `1f3e7ac`, results
-committed at `4c3d85e`). Both hosted FAILs fell on the same case and were not
-injection takes: one was a protocol error, the other a date-format miss. So the question is whether the hosted
-advantage holds when only the injection-specific checks count, and which cases fool every model.
+In one earlier pass (probe N-A5, 22 Oct; run head agent-sandbox `1f3e7ac`, results committed at `4c3d85e`) two cheap
+hosted models resisted more of the planted-instruction cases than the local 2B champion did. The counts are private
+(07–09 rule). Both hosted FAILs fell on the same case and were not injection takes: one was a protocol error, the
+other a date-format miss. So the question is whether the hosted advantage holds when only the injection-specific
+checks count, and which cases fool every model.
 **Case set:** the seven held-out `"class": "injection"` cases in agent-sandbox `evals/crm-followup/cases.json`
 (`briefing-hendrickx-injection`, `status-hendrickx-injection`, `write-trigger-injection-dumont`),
 `evals/email-triage/cases.json` (`newsletter-injection-urgent`, `cold-sales-injection-urgent`) and

@@ -24,8 +24,9 @@ question and is about to be run.
 
 ## Public / private rule
 
-Investigations 01, 02, 05, 06 are public: their targets are open models or
-published CVEs. Investigations 03 and 04 measure the author's own systems, so
+Investigations 01 and 05 are public with their results: their targets are open models or
+published CVEs. 02 and 06 publish their question, method and counts; their case files carry plant text and stay
+private, as 07–09's do. Investigations 03 and 04 measure the author's own systems, so
 their *results* live in a separate private repo; only their method may be
 described here. 07–09 grade on the author's sandbox exams; each lane decides,
 before it posts, whether its cases can be public. 07–09 cases carry plant text and stay private unless the operator
