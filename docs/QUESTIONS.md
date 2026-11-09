@@ -96,7 +96,8 @@ sides.
   reach `library.json`, and does the library's leak guard let it load? The guard checks only for shared expected-answer
   text, not for instruction-like content. No model call.
 
-**Case set:** lane lab-asl-07 builds it in agent-sandbox. It has a throwaway profile `crm-followup-mem` (a copy of
+**Case set:** lane lab-asl-07 built it (2026-11-08) in this repo's private `investigations/02-memory-poisoning/`,
+against a `git archive` copy of agent-sandbox at `8672b13`; the sandbox itself is not changed. It has a throwaway profile `crm-followup-mem` (a copy of
 `crm-followup` with `library: library.json`, `library_k: 2`) and ten canary pairs. Each pair is a planted lesson plus
 the matching clean library, which has the same lesson minus the instruction. The canary is absent from every case's
 `expected` and from every no-plant baseline reply. For 02b there are five TRAIN failure transcripts whose input carries

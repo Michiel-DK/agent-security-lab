@@ -19,6 +19,8 @@ redactor against the key and ties each sit to its inputs). Public checkout (resu
 In both modes every k/n or two-decimal number in the docs/INDEX.md row and in the result cell of the LESSONS.md row must
 be one the receipt carries, and the INDEX row must carry at least one (operator decision 2026-11-09: counts public,
 cases private).
+Investigation 02's `check.py` (no number posted yet: asserts the case-set freeze and shape) is wired the same way.
+08b (ten legitimate writes, same directory as 08) has `check_08b.py`, wired the same way; it posts no number in INDEX.
 """
 from __future__ import annotations
 
@@ -287,8 +289,43 @@ def check_08(verbose: bool = True, root: Path = ROOT) -> list[str]:
     return _check_receipted("08", "08-confirm-on-mutate", verbose, root)
 
 
+def check_08b(verbose: bool = True, root: Path = ROOT) -> list[str]:
+    """08b lives in 08's private directory; no published file may carry an 08b number. Both modes assert that the INDEX
+    08b row has none; the private checkout also re-replays the recording and re-derives findings-08b.md."""
+    inv = root / "investigations" / "08-confirm-on-mutate"
+    if not (inv / "check_08b.py").exists():
+        index = (root / "docs" / "INDEX.md").read_text()
+        m = re.search(r"^\| 08b \|.*$", index, re.M)
+        hits = re.findall(r"\d+\s*(?:/|of)\s*\d+", m.group(0)) if m else []
+        if verbose:
+            print("  08b results private, absent here: only checked that the INDEX 08b row carries no number")
+        return ([] if m else ["INDEX: no 08b row"]) + ([f"INDEX 08b row carries {hits} with no results to re-derive them"] if hits else [])
+    spec = importlib.util.spec_from_file_location("inv08b_check", inv / "check_08b.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.check(root, verbose=verbose)
+
+
 def check_09(verbose: bool = True, root: Path = ROOT) -> list[str]:
     return _check_receipted("09", "09-pii-redaction", verbose, root)
 
 
-CHECKS = {"01": check_01, "05": check_05, "07": check_07, "08": check_08, "09": check_09}
+def check_02(verbose: bool = True, root: Path = ROOT) -> list[str]:
+    """02's case set holds plant text, so it stays private; no published file may carry an 02 number. Nothing is posted
+    yet: the private checkout asserts the case-set freeze (sha256 block in question.md) and its shape; both modes assert
+    that the INDEX 02 row carries no k/n."""
+    inv = root / "investigations" / "02-memory-poisoning"
+    if not (inv / "check.py").exists():
+        index = (root / "docs" / "INDEX.md").read_text()
+        m = re.search(r"^\| 02 \|.*$", index, re.M)
+        hits = re.findall(r"\d+\s*(?:/|of)\s*\d+", m.group(0)) if m else []
+        if verbose:
+            print("  02 case set private, absent here: only checked that the INDEX 02 row carries no number")
+        return ([] if m else ["INDEX: no 02 row"]) + ([f"INDEX 02 row carries {hits} with no results to re-derive them"] if hits else [])
+    spec = importlib.util.spec_from_file_location("inv02_check", inv / "check.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.check(root, verbose=verbose)
+
+
+CHECKS = {"01": check_01, "02": check_02, "05": check_05, "07": check_07, "08": check_08, "08b": check_08b, "09": check_09}
