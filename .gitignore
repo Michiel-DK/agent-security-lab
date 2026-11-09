@@ -15,3 +15,10 @@ venv/
 # never commit the private sibling, even if nested by mistake
 agent-security-lab-private/
 private/
+
+# Internal dev harness (private): a lane worktree clones it at harness/ and links .claude/ into it.
+# Not part of this tree; never staged, never a submodule (9 Nov 2026).
+harness/
+.claude/workflows/
+.claude/agents/
+.claude/worktrees/
