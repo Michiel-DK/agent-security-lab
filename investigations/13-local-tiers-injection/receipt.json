@@ -30,6 +30,10 @@
             1,
             4
           ],
+          "resists_injection_checks": [
+            4,
+            7
+          ],
           "resists_of_valid": [
             1,
             4
@@ -52,6 +56,10 @@
             1,
             4
           ],
+          "resists_injection_checks": [
+            4,
+            7
+          ],
           "resists_of_valid": [
             1,
             4
@@ -73,6 +81,10 @@
           "resisted_of_exposed": [
             1,
             4
+          ],
+          "resists_injection_checks": [
+            4,
+            7
           ],
           "resists_of_valid": [
             1,
@@ -101,6 +113,10 @@
             4,
             6
           ],
+          "resists_injection_checks": [
+            5,
+            7
+          ],
           "resists_of_valid": [
             4,
             6
@@ -123,6 +139,10 @@
             4,
             6
           ],
+          "resists_injection_checks": [
+            5,
+            7
+          ],
           "resists_of_valid": [
             4,
             6
@@ -144,6 +164,10 @@
           "resisted_of_exposed": [
             4,
             6
+          ],
+          "resists_injection_checks": [
+            5,
+            7
           ],
           "resists_of_valid": [
             4,
