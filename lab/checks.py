@@ -11,11 +11,12 @@ Investigation 01 is checked three ways:
   3. the 01 row of `docs/INDEX.md` must quote the same numbers.
 Not checked: numbers in findings.md's prose ("Reading"), README's Lab section and SHOWCASE.md; they copy table cells.
 Investigation 05 has its own `check.py`; it is run as a subprocess and its exit code is the verdict.
-Investigations 07, 08, 09 and 13 keep their results, cases and findings private (they carry plant text) and publish a
+Investigations 07, 08, 09, 13 and 14 keep their results, cases and findings private (they carry plant text) and publish a
 counts-only `receipt.json`, derived by code (`python3 -I check.py --receipt` in the investigation). They are checked in two
 modes. Private checkout (results present): the receipt must equal a fresh derivation, then the investigation's own
 `check.py` re-derives findings.md (07: derive + compare; 08: re-replays the case set through the rule; 09: re-runs the
-redactor against the key and ties each sit to its inputs). Public checkout (results absent): only the receipt is there.
+redactor against the key and ties each sit to its inputs; 14: re-runs both name arms on 09's key, re-builds the list
+and ties each sit to its arm's redactor). Public checkout (results absent): only the receipt is there.
 In both modes every k/n or two-decimal number in the docs/INDEX.md row and in the result cell of the LESSONS.md row must
 be one the receipt carries, and the INDEX row must carry at least one (operator decision 2026-11-09: counts public,
 cases private).
@@ -333,5 +334,27 @@ def check_13(verbose: bool = True, root: Path = ROOT) -> list[str]:
     return _check_receipted("13", "13-local-tiers-injection", verbose, root)
 
 
+def check_14(verbose: bool = True, root: Path = ROOT) -> list[str]:
+    """14 (a second name arm for 09's redactor: widened list, local NER) is receipted like 09: counts public, the list,
+    the NER output, the redacted inputs and the replies private."""
+    drift = _check_receipted("14", "14-name-redaction", verbose, root)
+    # the false-redaction counts are bare integers, which _public_rows_drift does not see: check the posted phrases
+    rec_path = root / "investigations" / "14-name-redaction" / "receipt.json"
+    if rec_path.exists():
+        f = {a: json.loads(rec_path.read_text())["arms"][a]["false_redactions_original"] for a in ("v1", "L", "N")}
+        want = {"INDEX": f"v1 {f['v1']} false redaction{'' if f['v1'] == 1 else 's'}, L {f['L']}, N {f['N']}",
+                "LESSONS": f"false redactions L {f['L']}, N {f['N']} (v1 {f['v1']})"}
+        rows = {"INDEX": re.search(r"^\| 14 \|.*$", (root / "docs" / "INDEX.md").read_text(), re.M)}
+        lessons = (root / "LESSONS.md").read_text() if (root / "LESSONS.md").exists() else ""
+        m = re.search(r"^\| 14 .*$", lessons, re.M)
+        rows["LESSONS"] = m and [c.strip() for c in m.group(0).strip().strip("|").split("|")][2]
+        for where, phrase in want.items():
+            row = rows[where]
+            text = row.group(0) if hasattr(row, "group") else row
+            if not text or phrase not in text:
+                drift.append(f"{where} 14 row does not carry receipt.json's false-redaction counts ({phrase!r})")
+    return drift
+
+
 CHECKS = {"01": check_01, "02": check_02, "05": check_05, "07": check_07, "08": check_08, "08b": check_08b, "09": check_09,
-          "13": check_13}
+          "13": check_13, "14": check_14}

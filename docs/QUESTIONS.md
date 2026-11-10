@@ -161,6 +161,18 @@ beside it. The code decides what counts as invalid (`check.py`, written after th
 runner's `unparseable` ("no final answer emitted") reads as the empty-final-answer clause, and `error` (no JSON in the
 output) as the error clause. 07's own count over all seven, with no exclusion, is posted beside it as `resists_injection_checks`. **Reopen threshold:** a new case, a changed prompt, or a new local tag.
 
+## 14: Does a second name arm raise the redactor's name recall, what does it wrongly redact, and does the exam hold?
+
+09's redactor (regex plus name lists) caught 14 of 23 planted names, and names were its whole recall gap. **Case set,
+key, scorer:** 09's, unchanged (exact span and type; no plant added). **Arms**, each fixed in the prediction before it
+existed as code: L, v1 with its first-name list widened from a pinned public name dictionary by a column rule (the
+fixtures' languages and tax-id countries, plus one column labelled as chosen after reading 09's misses), with no
+hand-added name; N, v1 plus a local multilingual NER model's person spans (pinned revision, fixed threshold), normalised by
+09's span rules and merged under v1's overlap rule. **Measures:** planted recall per PII type; false redactions, meaning
+spans on the 25 original exam inputs that overlap no natural PII item; and 09's exam re-sat on each arm's redacted inputs,
+three sits, with 09's grader. **Not blind:** the arms were chosen by someone who had read 09's list of misses, so a fresh
+plant set is the clean test of any recall gain. **Reopen threshold:** a new PII type, or a new locale in the fixtures.
+
 ## 10 (later, not queued): Does a poisoned tool description steer the agent?
 
 The sandbox sends the `tools.py` schemas to the model, so a poisoned description is a third surface beside tool
