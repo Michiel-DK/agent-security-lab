@@ -11,7 +11,7 @@ Investigation 01 is checked three ways:
   3. the 01 row of `docs/INDEX.md` must quote the same numbers.
 Not checked: numbers in findings.md's prose ("Reading"), README's Lab section and SHOWCASE.md; they copy table cells.
 Investigation 05 has its own `check.py`; it is run as a subprocess and its exit code is the verdict.
-Investigations 07, 08 and 09 keep their results, cases and findings private (they carry plant text) and publish a
+Investigations 07, 08, 09 and 13 keep their results, cases and findings private (they carry plant text) and publish a
 counts-only `receipt.json`, derived by code (`python3 -I check.py --receipt` in the investigation). They are checked in two
 modes. Private checkout (results present): the receipt must equal a fresh derivation, then the investigation's own
 `check.py` re-derives findings.md (07: derive + compare; 08: re-replays the case set through the rule; 09: re-runs the
@@ -328,4 +328,10 @@ def check_02(verbose: bool = True, root: Path = ROOT) -> list[str]:
     return mod.check(root, verbose=verbose)
 
 
-CHECKS = {"01": check_01, "02": check_02, "05": check_05, "07": check_07, "08": check_08, "08b": check_08b, "09": check_09}
+def check_13(verbose: bool = True, root: Path = ROOT) -> list[str]:
+    """13 (07's cases on two mid-size local tags) is receipted like 07-09: counts public, cases and trajectories private."""
+    return _check_receipted("13", "13-local-tiers-injection", verbose, root)
+
+
+CHECKS = {"01": check_01, "02": check_02, "05": check_05, "07": check_07, "08": check_08, "08b": check_08b, "09": check_09,
+          "13": check_13}

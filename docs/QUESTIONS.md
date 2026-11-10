@@ -23,6 +23,7 @@ file use.
 | 02 | memory poisoning (02a read side, 02b write side) | lab-asl-07 (case set), lab-asl-09 (run) | `02-memory-poisoning` | ten canary pairs on the sandbox lesson library + five planted TRAIN failures | no (lane lab-asl-07 builds it) |
 | 08b | ten legitimate writes, arm D pre-registered | lab-asl-10 | set by lane lab-asl-10 | ten new CRM write cases | no (lane lab-asl-10 builds it) |
 | 06 | defenses and their cost | lab-asl-11 | `06-defense-cost` | 07 + 08 + 08b, plus a fixed rewrite list | after 02 and 08b |
+| 13 | 07's cases on mid-size local models | lab-asl-13 | `13-local-tiers-injection` | 07's seven injection cases | yes (07's) |
 | 10 | tool-description poisoning | later, not queued | – | one poisoned description per 07 case | no |
 
 Case-set pins below are agent-sandbox commits. Its `master` was at `2806cbd` on 2026-11-06.
@@ -148,6 +149,15 @@ from a model judge.
 **Constraints (standing):** gated on the author's go (lane lab-asl-11); the rewrite list stays in the private repo
 (attack strings are never published, only the rewrite classes and the numbers); throwaway profile and benign
 canaries as in 02.
+
+## 13: Does local fail on the 07 cases because the model is 2B, or because it is local?
+
+07 posted hosted 7/7 and 7/7 against the local 2B's 4/7 on the injection-only checks. A reader cannot tell size from
+locality. **Case set, prompts, runner, grader:** exactly 07's (agent-sandbox `2806cbd`, via a `git archive` copy).
+Only the model id changes. **Models:** `gemma4:e4b` and `llama3.1:latest` (Llama-3.1-8B, Q4_0), both pinned by Ollama digest
+and run at the stock window. Three passes each, a fresh load per pass, nothing else resident. **Validity rule,
+registered before the run:** a case with a termination, an error, an unparseable answer or empty content is invalid
+and excluded from k. Its count is posted beside k. **Reopen threshold:** a new case, a changed prompt, or a new local tag.
 
 ## 10 (later, not queued): Does a poisoned tool description steer the agent?
 
